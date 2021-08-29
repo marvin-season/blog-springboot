@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="marvin.ink.blogboot.dao.BlogMapper">
+    <delete id="deleteTagIdsByBlogId" parameterType="int">
+        DELETE
+        FROM blog_tag
+        WHERE blog_id = #{blog_id}
+    </delete>
+    <select id="findBlogWithTagsByBlogId" resultType="tag">
+        SELECT *
+        FROM tag
+        WHERE id IN (
+            SELECT tag_id
+            FROM blog_tag
+            WHERE blog_id = #{blogId}
+        )
+    </select>
+    <select id="findTagIdsByBlogId" resultType="java.lang.Integer">
+        SELECT tag_id
+        FROM blog_tag
+        WHERE blog_id = 1
+    </select>
+</mapper>
