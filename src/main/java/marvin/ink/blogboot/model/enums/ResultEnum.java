@@ -33,7 +33,7 @@ public enum ResultEnum {
 
     FILE_UPLOAD_ERROR(406, "上传文件错误"),
 
-    INSUFFICIENT_STOCK(407, "库存不足"),
+    ACCOUNT_EXCEPTION(407, "账户异常"),
 
     PRINTER_INVOKE_ERROR(408, "打印机调用错误"),
 

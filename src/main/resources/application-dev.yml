@@ -25,3 +25,4 @@ spring:
     url: jdbc:mysql://101.132.164.106:3306/marvin_blog?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: M@wenshu278990
+
