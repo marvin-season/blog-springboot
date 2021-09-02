@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * 认证成功
+ */
 @Component
 @Slf4j
 public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHandler {

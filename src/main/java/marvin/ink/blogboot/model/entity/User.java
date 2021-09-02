@@ -35,6 +35,7 @@ public class User extends BaseEntity implements UserDetails {
     @TableField(exist = false)
     private Set<Role> roles;
 
+    @TableField(exist = false)
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
@@ -49,7 +50,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !locked;
+        return true;
     }
 
     @Override

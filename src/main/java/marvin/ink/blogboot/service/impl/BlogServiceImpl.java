@@ -17,12 +17,12 @@ import marvin.ink.blogboot.model.entity.Category;
 import marvin.ink.blogboot.model.entity.Tag;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.model.pojo.BlogTag;
-import marvin.ink.blogboot.vo.req.blog.BlogPageSearchReq;
-import marvin.ink.blogboot.vo.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.vo.res.blog.BlogRes;
 import marvin.ink.blogboot.service.BlogService;
 import marvin.ink.blogboot.service.CategoryService;
 import marvin.ink.blogboot.service.TagService;
+import marvin.ink.blogboot.vo.req.blog.BlogPageSearchReq;
+import marvin.ink.blogboot.vo.req.blog.BlogSaveReq;
+import marvin.ink.blogboot.vo.res.blog.BlogRes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -155,5 +155,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Transactional
     public void deleteById(Integer id) {
         super.removeById(id);
+    }
+
+    @Override
+    public BlogRes findBlogByBlogId(int id) {
+        BlogRes blogRes = baseMapper.findBlogByBlogId(id);
+        if(ObjectUtil.isNull(blogRes)){
+            throw CustomizeException.is(ResultEnum.DATA_NO_FOUND).hint("博客不存在!或被移动");
+        }
+        return blogRes;
     }
 }

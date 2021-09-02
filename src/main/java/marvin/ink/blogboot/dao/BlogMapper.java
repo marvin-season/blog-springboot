@@ -3,6 +3,7 @@ package marvin.ink.blogboot.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import marvin.ink.blogboot.model.entity.Blog;
 import marvin.ink.blogboot.model.entity.Tag;
+import marvin.ink.blogboot.vo.res.blog.BlogRes;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface BlogMapper extends BaseMapper<Blog> {
     List<Integer> findTagIdsByBlogId(@Param("blogId") Integer blogId);
 
     void deleteTagIdsByBlogId(Integer blogId);
+
+    BlogRes findBlogByBlogId(@Param("id") int id);
 }

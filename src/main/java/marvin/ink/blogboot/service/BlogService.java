@@ -1,6 +1,7 @@
 package marvin.ink.blogboot.service;
 
 import marvin.ink.blogboot.model.common.PageData;
+import marvin.ink.blogboot.model.entity.Blog;
 import marvin.ink.blogboot.vo.req.blog.BlogPageSearchReq;
 import marvin.ink.blogboot.vo.req.blog.BlogSaveReq;
 import marvin.ink.blogboot.vo.res.blog.BlogRes;
@@ -19,4 +20,6 @@ public interface BlogService {
     List<BlogRes> findUnpublishedBlogByAuthorId(Integer authorId);
 
     void deleteById(Integer id);
+
+    BlogRes findBlogByBlogId(int id);
 }

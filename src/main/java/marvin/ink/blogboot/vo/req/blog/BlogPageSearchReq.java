@@ -20,13 +20,11 @@ public class BlogPageSearchReq extends PageRequest {
     /**
      * 所属作者 or 用户
      */
-    @NotBlank(message = "作者id不能为空")
     private Integer authorId;
 
     /**
      * 标题
      */
-    @NotBlank(message = "文章标题不能为空")
     private String title;
 
     /**

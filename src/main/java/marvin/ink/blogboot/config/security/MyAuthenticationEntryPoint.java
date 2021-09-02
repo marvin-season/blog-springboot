@@ -1,6 +1,8 @@
 package marvin.ink.blogboot.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import marvin.ink.blogboot.model.common.MyResponse;
+import marvin.ink.blogboot.model.enums.ResultEnum;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -11,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * 未认证访问
+ */
 @Component
 public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
@@ -19,7 +24,8 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setCharacterEncoding("utf-8");
         ServletOutputStream out = response.getOutputStream();
         ObjectMapper objectMapper = new ObjectMapper();
-        out.write(objectMapper.writeValueAsBytes(authException));
+        MyResponse myResponse = MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("请先登录");
+        out.write(objectMapper.writeValueAsBytes(myResponse));
         out.flush();
         out.close();
     }

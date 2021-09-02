@@ -20,4 +20,32 @@
         FROM blog_tag
         WHERE blog_id = 1
     </select>
+
+    <resultMap id="BlogResMap" type="marvin.ink.blogboot.vo.res.blog.BlogRes">
+        <id property="id" column="id"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="authorId" column="author_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="collectCount" column="collectCount"/>
+        <result property="likeCount" column="likeCount"/>
+        <result property="viewCount" column="viewCount"/>
+        <result property="published" column="published"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <collection property="tags" ofType="tag">
+            <id property="id" column="tid"/>
+            <result property="tagName" column="tag_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="findBlogByBlogId" resultMap="BlogResMap">
+        SELECT blog.*,
+               tag.tag_name,
+               tag.id as tid
+        FROM blog
+                 LEFT JOIN blog_tag ON blog.id = blog_tag.blog_id
+                 LEFT JOIN tag ON tag.id = blog_tag.tag_id
+        WHERE blog.id = 1 and blog.locked = false
+    </select>
 </mapper>

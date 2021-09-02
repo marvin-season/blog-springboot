@@ -40,11 +40,16 @@ public class BlogController {
         return blogService.findPublishedBlogByCondition(blogPageSearchReq);
     }
 
-
     @ApiOperation("查询未发布博客")
     @GetMapping("unpublished/{authorId}")
     public List<BlogRes> findUnpublishedBlogByCondition(@PathVariable("authorId") Integer authorId) {
         return blogService.findUnpublishedBlogByAuthorId(authorId);
+    }
+
+    @ApiOperation("根据id查询博客")
+    @GetMapping("/{id}")
+    public BlogRes findBlogByBlogId(@PathVariable int id){
+        return blogService.findBlogByBlogId(id);
     }
 
     @ApiOperation("根据博客id删除个人的博客")
