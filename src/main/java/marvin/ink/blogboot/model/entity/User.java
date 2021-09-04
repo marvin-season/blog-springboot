@@ -32,6 +32,8 @@ public class User extends BaseEntity implements UserDetails {
 
     private String phone;
 
+    private String wx;
+
     @TableField(exist = false)
     private Set<Role> roles;
 
@@ -50,7 +52,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override

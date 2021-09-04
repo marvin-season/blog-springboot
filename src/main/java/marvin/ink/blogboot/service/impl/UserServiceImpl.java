@@ -48,6 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         userRegistryReq.setPassword(passwordEncoder.encode(userRegistryReq.getPassword()));
         user = BeanUtil.copyProperties(userRegistryReq, User.class);
+        user.setLocked(false);
         baseMapper.insert(user);
         log.info("用户注册成功");
     }
