@@ -13,5 +13,5 @@ public class UserLoginReq {
 
     private String password;
 
-    private String capture;
+//    private String capture;
 }

@@ -1,10 +1,6 @@
 package marvin.ink.blogboot.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.vo.req.user.UserRegistryReq;
-import marvin.ink.blogboot.vo.res.user.UserLoginRes;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**

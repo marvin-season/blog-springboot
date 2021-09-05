@@ -1,6 +1,9 @@
 package marvin.ink.blogboot.config.security;
 
+import marvin.ink.blogboot.filter.JWTAuthenticationFilter;
+import marvin.ink.blogboot.filter.LoginFilter;
 import marvin.ink.blogboot.service.UserService;
+import marvin.ink.blogboot.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +26,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private UserService userService;
 
+    @Resource
+    private JwtUtils jwtUtils;
+
     //  权限继承
     @Bean
     RoleHierarchy roleHierarchy() {
@@ -32,20 +38,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    MyAuthenticationSuccessHandler successHandler;
-
-    @Autowired
     MyAuthenticationEntryPoint authenticationEntryPointHandler;
 
     @Autowired
     MyAccessDeniedHandler accessDeniedHandler;
-
-    @Autowired
-    MyAuthenticationFailureHandler authenticationFailureHandler;
-
-    @Autowired
-    MyLogoutSuccessHandler logoutSuccessHandler;
-
 
     private final String[] allowUrls = {
             "/swagger-ui.html",
@@ -65,36 +61,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(allowUrls).permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
-
-                // 登录处理
-                .and()
-                .formLogin()
-                .loginProcessingUrl("/user/login")
-                .passwordParameter("password")
-                .usernameParameter("username")
-                .successHandler(successHandler) // json 返回
-                .failureHandler(authenticationFailureHandler)
-                .permitAll()
-
-                // 登出处理
-                .and()
-                .logout()
-                .logoutSuccessHandler(logoutSuccessHandler)
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .permitAll()
                 // 异常处理
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler) // 角色无权限
                 .authenticationEntryPoint(authenticationEntryPointHandler) // 未认证
-
+                // 过滤器
                 .and()
+                .addFilter(new LoginFilter(authenticationManager(), jwtUtils))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtUtils))
                 .csrf().disable(); // 跨站请求伪造
         // 跨域
-        http.cors().configurationSource(CorsConfigurationSource());
+//        http.cors().configurationSource(CorsConfigurationSource());
     }
 
     @Override

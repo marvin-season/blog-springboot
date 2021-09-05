@@ -1,6 +1,7 @@
 package marvin.ink.blogboot.config;
 
 import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.common.MyResponse;
@@ -60,6 +61,12 @@ public class ExceptionControllerAdvice {
                 .collect(Collectors.toList());
         String hint = CollUtil.join(collect, "，");
         return MyResponse.is(ResultEnum.PARAM_ERROR).hint(hint);
+    }
+
+    @ExceptionHandler(UnrecognizedPropertyException.class)
+    public MyResponse<?> exception(UnrecognizedPropertyException e) {
+        log.warn("{}", e.toString());
+        return MyResponse.is(ResultEnum.ERROR).hint(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
