@@ -1,4 +1,4 @@
-package marvin.ink.blogboot.config.security;
+package marvin.ink.blogboot.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import marvin.ink.blogboot.model.common.MyResponse;
@@ -17,16 +17,12 @@ import java.io.IOException;
  * 未认证访问
  */
 @Component
-public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class MyAuthenticationEntryPointHandler implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("application/json;charset=utf-8");
-        response.setCharacterEncoding("utf-8");
-        ServletOutputStream out = response.getOutputStream();
-        ObjectMapper objectMapper = new ObjectMapper();
-        MyResponse myResponse = MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("请先登录");
-        out.write(objectMapper.writeValueAsBytes(myResponse));
-        out.flush();
-        out.close();
+        try (ServletOutputStream out = response.getOutputStream()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            out.write(objectMapper.writeValueAsBytes(MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("请先登录")));
+        }
     }
 }

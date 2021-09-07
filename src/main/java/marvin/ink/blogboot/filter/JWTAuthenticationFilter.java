@@ -6,6 +6,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.config.security.JwtProperties;
 import marvin.ink.blogboot.utils.JwtUtils;
+import marvin.ink.blogboot.vo.req.user.UserLoginReq;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,8 +39,8 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
         try {
             String header = ServletUtil.getHeader(request, JwtProperties.HEADER, StandardCharsets.UTF_8);
             if (ObjectUtil.isNotEmpty(header) && header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-                String replace = header.replace(JwtProperties.TOKEN_PREFIX, StrUtil.EMPTY);
-                Authentication authentication = jwtUtils.parseJwtToken(replace);
+                String token = header.replace(JwtProperties.TOKEN_PREFIX, StrUtil.EMPTY);
+                Authentication authentication = jwtUtils.parseJwtToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {

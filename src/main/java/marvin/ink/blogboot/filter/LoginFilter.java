@@ -1,9 +1,11 @@
 package marvin.ink.blogboot.filter;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.config.security.JwtProperties;
+import marvin.ink.blogboot.config.security.UserSession;
 import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.common.MyResponse;
 import marvin.ink.blogboot.model.enums.ResultEnum;
@@ -18,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,7 +34,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtils jwtUtils;
 
     private final AuthenticationManager authenticationManager;
-
 
     public LoginFilter(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.authenticationManager = authenticationManager;
@@ -58,15 +60,23 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         System.out.println(authResult);
 
-        String token = jwtUtils.genToken(authResult.getPrincipal());
+
+        UserSession userSession = BeanUtil.copyProperties(authResult.getPrincipal(), UserSession.class);
+        String token = jwtUtils.genToken(userSession);
         UserTokenRes userTokenRes = new UserTokenRes().setToken(JwtProperties.TOKEN_PREFIX + token).setHeader(JwtProperties.HEADER);
-        new ObjectMapper().writeValue(response.getOutputStream(), MyResponse.success(userTokenRes));
+
+        try (ServletOutputStream out = response.getOutputStream()) {
+            new ObjectMapper().writeValue(out, MyResponse.success(userTokenRes));
+        }
+
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.warn("登陆失败");
 
-        new ObjectMapper().writeValue(response.getOutputStream(), MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("登陆失败"));
+        try (ServletOutputStream out = response.getOutputStream();) {
+            new ObjectMapper().writeValue(out, MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("登陆失败"));
+        }
     }
 }

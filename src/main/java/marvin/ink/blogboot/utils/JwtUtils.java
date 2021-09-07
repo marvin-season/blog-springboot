@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.config.security.JwtProperties;
 import marvin.ink.blogboot.model.entity.User;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 /**
@@ -22,6 +24,7 @@ import java.util.Map;
  * @Date: 2021/9/5 20:01
  */
 @Component
+@Slf4j
 public class JwtUtils {
 
     @Resource
@@ -50,6 +53,7 @@ public class JwtUtils {
                 .parse(token)
                 .getBody();
         User user = BeanUtil.copyProperties(body, User.class);
+        log.info("user={}", user);
         return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
     }
 }

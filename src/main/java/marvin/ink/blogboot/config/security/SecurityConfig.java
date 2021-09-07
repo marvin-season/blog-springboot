@@ -2,6 +2,8 @@ package marvin.ink.blogboot.config.security;
 
 import marvin.ink.blogboot.filter.JWTAuthenticationFilter;
 import marvin.ink.blogboot.filter.LoginFilter;
+import marvin.ink.blogboot.handler.MyAccessDeniedHandler;
+import marvin.ink.blogboot.handler.MyAuthenticationEntryPointHandler;
 import marvin.ink.blogboot.service.UserService;
 import marvin.ink.blogboot.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    MyAuthenticationEntryPoint authenticationEntryPointHandler;
+    MyAuthenticationEntryPointHandler authenticationEntryPointHandler;
 
     @Autowired
     MyAccessDeniedHandler accessDeniedHandler;
@@ -49,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-resources/**",
             "/v2/**",
             "/doc.html",
-            "/user/login",
+            "/login",
             "/user/registry",
             "/user/forget-password",
             "/user/verification-code",
@@ -66,14 +68,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler) // 角色无权限
-                .authenticationEntryPoint(authenticationEntryPointHandler) // 未认证
+                .authenticationEntryPoint(authenticationEntryPointHandler) // 未认证访问
                 // 过滤器
                 .and()
                 .addFilter(new LoginFilter(authenticationManager(), jwtUtils))
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtUtils))
                 .csrf().disable(); // 跨站请求伪造
         // 跨域
-//        http.cors().configurationSource(CorsConfigurationSource());
+        http.cors().configurationSource(CorsConfigurationSource());
     }
 
     @Override
@@ -88,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("*");    //同源配置，*表示任何请求都视为同源，若需指定ip和端口可以改为如“localhost：8080”，多个以“，”分隔；
         corsConfiguration.addAllowedHeader("*");//header，允许哪些header，本案中使用的是token，此处可将*替换为token；
-        corsConfiguration.addAllowedMethod("*");    //允许的请求方法，POSeT、GET等
+        corsConfiguration.addAllowedMethod("*");    //允许的请求方法，POST、GET等
         source.registerCorsConfiguration("/**", corsConfiguration); //配置允许跨域访问的url
         return source;
     }
