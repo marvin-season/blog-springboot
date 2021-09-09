@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("captcha")
 @Api(tags = "验证码管理接口")
 public class CaptchaController {
-    @Autowired
     public CaptchaService captchaService;
+
+    @Autowired
+    public void setCaptchaService(CaptchaService captchaService) {
+        this.captchaService = captchaService;
+    }
 
     @ApiOperation("验证码获取")
     @GetMapping("captcha")
