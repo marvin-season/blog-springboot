@@ -3,7 +3,7 @@ package marvin.ink.blogboot;
 import cn.hutool.core.bean.BeanUtil;
 import marvin.ink.blogboot.config.security.JwtProperties;
 import marvin.ink.blogboot.utils.JwtUtils;
-import marvin.ink.blogboot.vo.req.user.UserLoginReq;
+import marvin.ink.blogboot.req.user.UserLoginReq;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

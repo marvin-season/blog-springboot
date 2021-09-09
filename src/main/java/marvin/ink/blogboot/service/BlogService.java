@@ -1,10 +1,9 @@
 package marvin.ink.blogboot.service;
 
 import marvin.ink.blogboot.model.common.PageData;
-import marvin.ink.blogboot.model.entity.Blog;
-import marvin.ink.blogboot.vo.req.blog.BlogPageSearchReq;
-import marvin.ink.blogboot.vo.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.vo.res.blog.BlogRes;
+import marvin.ink.blogboot.req.blog.BlogPageSearchReq;
+import marvin.ink.blogboot.req.blog.BlogSaveReq;
+import marvin.ink.blogboot.res.blog.BlogRes;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package marvin.ink.blogboot.config.security;
 
 import marvin.ink.blogboot.filter.JWTAuthenticationFilter;
-import marvin.ink.blogboot.filter.LoginFilter;
+import marvin.ink.blogboot.filter.TokenServiceFilter;
 import marvin.ink.blogboot.handler.MyAccessDeniedHandler;
 import marvin.ink.blogboot.handler.MyAuthenticationEntryPointHandler;
 import marvin.ink.blogboot.service.UserService;
@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,12 +26,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import javax.annotation.Resource;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private UserService userService;
 
-    @Resource
-    private JwtUtils jwtUtils;
+    @Autowired
+    private TokenServiceFilter tokenServiceFilter;
+
+    @Autowired
+    private JWTAuthenticationFilter jwtAuthenticationFilter;
 
     //  权限继承
     @Bean
@@ -58,6 +64,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/user/captcha",
     };
 
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
@@ -71,8 +83,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(authenticationEntryPointHandler) // 未认证访问
                 // 过滤器
                 .and()
-                .addFilter(new LoginFilter(authenticationManager(), jwtUtils))
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtUtils))
+                .addFilter(tokenServiceFilter)
+                .addFilterAfter(jwtAuthenticationFilter, TokenServiceFilter.class)
                 .csrf().disable(); // 跨站请求伪造
         // 跨域
         http.cors().configurationSource(CorsConfigurationSource());

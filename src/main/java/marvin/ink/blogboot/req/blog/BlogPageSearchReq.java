@@ -1,9 +1,8 @@
-package marvin.ink.blogboot.vo.req.blog;
+package marvin.ink.blogboot.req.blog;
 
 import lombok.Data;
 import marvin.ink.blogboot.model.common.PageRequest;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 

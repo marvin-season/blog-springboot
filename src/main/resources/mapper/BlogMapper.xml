@@ -21,7 +21,7 @@
         WHERE blog_id = 1
     </select>
 
-    <resultMap id="BlogResMap" type="marvin.ink.blogboot.vo.res.blog.BlogRes">
+    <resultMap id="BlogResMap" type="marvin.ink.blogboot.res.blog.BlogRes">
         <id property="id" column="id"/>
         <result property="updateTime" column="update_time"/>
         <result property="createTime" column="create_time"/>

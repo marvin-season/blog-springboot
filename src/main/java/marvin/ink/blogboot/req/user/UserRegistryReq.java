@@ -1,10 +1,8 @@
-package marvin.ink.blogboot.vo.req.user;
+package marvin.ink.blogboot.req.user;
 
 import lombok.Data;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * @Author: 马文澍

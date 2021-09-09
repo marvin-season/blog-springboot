@@ -1,6 +1,6 @@
 package marvin.ink.blogboot.service;
 
-import marvin.ink.blogboot.vo.req.user.UserRegistryReq;
+import marvin.ink.blogboot.req.user.UserRegistryReq;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**

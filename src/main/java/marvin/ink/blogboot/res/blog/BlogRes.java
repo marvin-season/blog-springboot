@@ -1,4 +1,4 @@
-package marvin.ink.blogboot.vo.res.blog;
+package marvin.ink.blogboot.res.blog;
 
 import marvin.ink.blogboot.model.entity.Blog;
 import marvin.ink.blogboot.model.entity.Tag;

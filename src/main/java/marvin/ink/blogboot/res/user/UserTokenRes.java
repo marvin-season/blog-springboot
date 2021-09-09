@@ -1,4 +1,4 @@
-package marvin.ink.blogboot.vo.res.user;
+package marvin.ink.blogboot.res.user;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

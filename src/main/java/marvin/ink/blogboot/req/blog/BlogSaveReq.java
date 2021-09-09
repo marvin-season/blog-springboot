@@ -1,4 +1,4 @@
-package marvin.ink.blogboot.vo.req.blog;
+package marvin.ink.blogboot.req.blog;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;

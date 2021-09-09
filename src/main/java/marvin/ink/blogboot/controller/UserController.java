@@ -1,11 +1,10 @@
 package marvin.ink.blogboot.controller;
 
+import marvin.ink.blogboot.req.user.UserRegistryReq;
+import marvin.ink.blogboot.res.captcha.CaptchaRes;
+import marvin.ink.blogboot.service.CaptchaService;
 import marvin.ink.blogboot.service.UserService;
-import marvin.ink.blogboot.vo.req.user.UserRegistryReq;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -20,8 +19,16 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private CaptchaService captchaService;
+
     @PostMapping("registry")
     public void registry(@RequestBody UserRegistryReq userRegistryReq) {
         userService.registry(userRegistryReq);
+    }
+
+    @GetMapping("captcha")
+    public CaptchaRes captcha() {
+        return captchaService.get();
     }
 }

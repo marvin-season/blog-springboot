@@ -11,7 +11,7 @@ import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.service.UserService;
-import marvin.ink.blogboot.vo.req.user.UserRegistryReq;
+import marvin.ink.blogboot.req.user.UserRegistryReq;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -23,6 +23,8 @@ public enum ResultEnum {
 
     PARAM_ERROR(400, "参数错误"),
 
+    CAPTCHA_ERROR(432, "参数错误"),
+
     AUTHEN_ERROR(401, "认证失败"),
 
     ACCESS_DENIED(403, "权限不足"),

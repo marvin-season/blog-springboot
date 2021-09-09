@@ -9,14 +9,17 @@ import marvin.ink.blogboot.config.security.UserSession;
 import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.common.MyResponse;
 import marvin.ink.blogboot.model.enums.ResultEnum;
+import marvin.ink.blogboot.req.user.UserLoginReq;
+import marvin.ink.blogboot.res.user.UserTokenRes;
+import marvin.ink.blogboot.service.CaptchaService;
 import marvin.ink.blogboot.utils.JwtUtils;
-import marvin.ink.blogboot.vo.req.user.UserLoginReq;
-import marvin.ink.blogboot.vo.res.user.UserTokenRes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,20 +27,26 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * @Author: 马文澍
  * @Date: 2021/9/5 16:27
  */
 @Slf4j
-public class LoginFilter extends UsernamePasswordAuthenticationFilter {
-    private final JwtUtils jwtUtils;
+@Component
+public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtils jwtUtils;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
+    @Autowired
+    private CaptchaService captchaService;
+
+    @Autowired
+    @Override
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        super.setAuthenticationManager(authenticationManager);
     }
 
     @Override
@@ -45,26 +54,29 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         UserLoginReq user = null;
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), UserLoginReq.class);
-            log.info(user.toString());
+
+            if (!captchaService.verify(user.getCaptchaId(), user.getCaptcha())) {
+                throw CustomizeException.is(ResultEnum.CAPTCHA_ERROR).hint("验证码错误");
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info("参数解析出错");
         }
         Assert.notNull(user, () -> CustomizeException.is(ResultEnum.PARAM_ERROR).hint("参数错误"));
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                user.getUsername(), user.getPassword());
-        return authenticationManager.authenticate(authenticationToken);
+                user.getUsername(), user.getPassword(), new ArrayList<>());
+        return super.getAuthenticationManager().authenticate(authenticationToken);
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
-        System.out.println(authResult);
-
 
         UserSession userSession = BeanUtil.copyProperties(authResult.getPrincipal(), UserSession.class);
         String token = jwtUtils.genToken(userSession);
-        UserTokenRes userTokenRes = new UserTokenRes().setToken(JwtProperties.TOKEN_PREFIX + token).setHeader(JwtProperties.HEADER);
 
+        UserTokenRes userTokenRes = new UserTokenRes().setToken(JwtProperties.TOKEN_PREFIX + token).setHeader(JwtProperties.HEADER);
+        response.setContentType("application/json;charset=utf-8");
+        request.setCharacterEncoding("utf-8");
         try (ServletOutputStream out = response.getOutputStream()) {
             new ObjectMapper().writeValue(out, MyResponse.success(userTokenRes));
         }
@@ -74,9 +86,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.warn("登陆失败");
-
+        response.setContentType("application/json;charset=utf-8");
         try (ServletOutputStream out = response.getOutputStream();) {
-            new ObjectMapper().writeValue(out, MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("登陆失败"));
+            new ObjectMapper().writeValue(out, MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("登录失败"));
         }
     }
 }
