@@ -45,7 +45,7 @@ public class ExceptionControllerAdvice {
      */
     @ExceptionHandler(CustomizeException.class)
     public MyResponse<?> exception(CustomizeException e) {
-        log.warn("CustomizeException: {}", e.toString());
+        log.warn("捕获到了异常 = {}", e.getHint());
         return MyResponse.is(e);
     }
 

@@ -19,16 +19,8 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    @Resource
-    private CaptchaService captchaService;
-
     @PostMapping("registry")
     public void registry(@RequestBody UserRegistryReq userRegistryReq) {
         userService.registry(userRegistryReq);
-    }
-
-    @GetMapping("captcha")
-    public CaptchaRes captcha() {
-        return captchaService.get();
     }
 }

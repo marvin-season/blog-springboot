@@ -60,8 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/login",
             "/user/registry",
             "/user/forget-password",
-            "/user/verification-code",
-            "/user/captcha",
+            "/captcha/**",
     };
 
     @Bean

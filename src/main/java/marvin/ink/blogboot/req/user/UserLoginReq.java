@@ -17,10 +17,4 @@ public class UserLoginReq {
 
     @NotNull(message = "密码不能为空")
     private String password;
-
-    @NotNull(message = "验证码不能为空")
-    private String captcha;
-
-    @NotNull(message = "验证码id不能为空")
-    private String captchaId;
 }

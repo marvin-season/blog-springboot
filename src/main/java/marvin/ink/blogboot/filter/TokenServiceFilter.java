@@ -51,17 +51,14 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        UserLoginReq user = null;
+        UserLoginReq user;
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), UserLoginReq.class);
-
-            if (!captchaService.verify(user.getCaptchaId(), user.getCaptcha())) {
-                throw CustomizeException.is(ResultEnum.CAPTCHA_ERROR).hint("验证码错误");
-            }
         } catch (IOException e) {
             log.info("参数解析出错");
+            throw CustomizeException.is(ResultEnum.PARAM_ERROR).hint("参数解析出错");
         }
-        Assert.notNull(user, () -> CustomizeException.is(ResultEnum.PARAM_ERROR).hint("参数错误"));
+        Assert.notNull(user, () -> CustomizeException.is(ResultEnum.PARAM_ERROR).hint("参数解析出错"));
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 user.getUsername(), user.getPassword(), new ArrayList<>());
