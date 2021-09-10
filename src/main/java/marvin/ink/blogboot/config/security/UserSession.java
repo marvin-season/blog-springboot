@@ -19,4 +19,11 @@ public class UserSession {
     private String qq;
 
     private Set<Role> roles;
+
+    private String mail;
+
+    private String phone;
+
+    private String wx;
+
 }

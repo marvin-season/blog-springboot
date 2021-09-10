@@ -10,8 +10,7 @@ import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.common.MyResponse;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.req.user.UserLoginReq;
-import marvin.ink.blogboot.res.user.UserTokenRes;
-import marvin.ink.blogboot.service.CaptchaService;
+import marvin.ink.blogboot.res.user.UserRes;
 import marvin.ink.blogboot.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +40,7 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private CaptchaService captchaService;
+    private ObjectMapper objectMapper;
 
     @Autowired
     @Override
@@ -71,11 +70,16 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
         UserSession userSession = BeanUtil.copyProperties(authResult.getPrincipal(), UserSession.class);
         String token = jwtUtils.genToken(userSession);
 
-        UserTokenRes userTokenRes = new UserTokenRes().setToken(JwtProperties.TOKEN_PREFIX + token).setHeader(JwtProperties.HEADER);
+        UserRes userRes = new UserRes()
+                .setUserSession(userSession)
+                .setToken(JwtProperties.TOKEN_PREFIX + token)
+                .setHeader(JwtProperties.HEADER);
         response.setContentType("application/json;charset=utf-8");
         request.setCharacterEncoding("utf-8");
+
+
         try (ServletOutputStream out = response.getOutputStream()) {
-            new ObjectMapper().writeValue(out, MyResponse.success(userTokenRes));
+            objectMapper.writeValue(out, MyResponse.success(userRes));
         }
 
     }
@@ -85,7 +89,7 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
         log.warn("登陆失败");
         response.setContentType("application/json;charset=utf-8");
         try (ServletOutputStream out = response.getOutputStream();) {
-            new ObjectMapper().writeValue(out, MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("登录失败"));
+            objectMapper.writeValue(out, MyResponse.is(ResultEnum.AUTHEN_ERROR).hint("登录失败"));
         }
     }
 }

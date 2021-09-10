@@ -2,6 +2,7 @@ package marvin.ink.blogboot.res.user;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import marvin.ink.blogboot.config.security.UserSession;
 
 /**
  * @Author: 马文澍
@@ -9,8 +10,10 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class UserTokenRes {
+public class UserRes {
     private String token;
 
     private String header;
+
+    private UserSession userSession;
 }
