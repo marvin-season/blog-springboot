@@ -1,0 +1,10 @@
+spring:
+  mvc:
+    async:
+      request-timeout: 1000
+  resources:
+    static-locations:
+      - classpath:/META-INF/resources/
+      - classpath:/resources/
+      - classpath:/static/
+      - classpath:/public/

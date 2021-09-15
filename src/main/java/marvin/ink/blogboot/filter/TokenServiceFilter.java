@@ -71,7 +71,6 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
         String token = jwtUtils.genToken(userSession);
 
         UserRes userRes = new UserRes()
-                .setUserSession(userSession)
                 .setToken(JwtProperties.TOKEN_PREFIX + token)
                 .setHeader(JwtProperties.HEADER);
         response.setContentType("application/json;charset=utf-8");

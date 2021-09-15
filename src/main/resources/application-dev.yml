@@ -27,10 +27,26 @@ spring:
     url: jdbc:mysql://101.132.164.106:3306/marvin_blog?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: M@wenshu278990
+---
 jwt:
   expire-time: 60000000
   secret: erwiuagaewyr*7832
+
 captcha:
   width: 100
   height: 50
   expire-time: 120000
+---
+# 文件上传
+aliyun:
+  oss:
+    access-key: LTAI5tDq6Az6zJrBmcKoxsc4
+    secret-key: U9gHUVcvk1M23ufFciB2O7uaBhqK87
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    bucket: marvin-blog
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+

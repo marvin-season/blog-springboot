@@ -14,6 +14,4 @@ public class UserRes {
     private String token;
 
     private String header;
-
-    private UserSession userSession;
 }

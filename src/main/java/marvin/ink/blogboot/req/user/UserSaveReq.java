@@ -9,7 +9,9 @@ import javax.validation.constraints.NotNull;
  * @Date: 2021/9/4 22:34
  */
 @Data
-public class UserRegistryReq {
+public class UserSaveReq {
+    private Integer id;
+
     @NotNull(message = "username 不能为空")
     private String username;
 
@@ -23,4 +25,6 @@ public class UserRegistryReq {
     private String mail;
 
     private String phone;
+    // 头像
+    private String avatar;
 }

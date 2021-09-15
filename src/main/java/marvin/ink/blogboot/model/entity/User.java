@@ -34,6 +34,11 @@ public class User extends BaseEntity implements UserDetails {
 
     private String wx;
 
+    /**
+     * 头像
+     */
+    private String avatar;
+
     @TableField(exist = false)
     private Set<Role> roles;
 

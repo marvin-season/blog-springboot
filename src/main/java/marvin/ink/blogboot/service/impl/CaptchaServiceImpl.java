@@ -6,6 +6,7 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.config.CaptchaProperties;
 import marvin.ink.blogboot.res.captcha.CaptchaRes;
@@ -40,9 +41,14 @@ public class CaptchaServiceImpl implements CaptchaService, InitializingBean {
 
     @Override
     public boolean verify(String id, String input) {
+
         String code = cache.get(id);
         log.info("id: {}, input: {}, code: {},存储位置={}", id, input, code, cache.hashCode());
         cache.remove(id);
+
+        if ("dev".equals(SpringUtil.getActiveProfile())) {
+            return true;
+        }
 
         return ObjectUtil.equals(code, input);
     }
