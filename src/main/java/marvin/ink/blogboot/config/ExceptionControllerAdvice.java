@@ -69,6 +69,12 @@ public class ExceptionControllerAdvice {
         return MyResponse.is(ResultEnum.ERROR).hint(e.getMessage());
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    public MyResponse<?> exception(NullPointerException e) {
+        e.printStackTrace();
+        return MyResponse.is(ResultEnum.ERROR).hint(e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public MyResponse<?> exception(Exception e) {
         log.warn("{}", e.toString());

@@ -1,6 +1,7 @@
 package marvin.ink.blogboot.service;
 
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.image.ImageUploadRes;
 import marvin.ink.blogboot.res.user.UserRes;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,5 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
  * Description: ImageService
  */
 public interface ImageService {
-    String upload(MultipartFile multipartFile);
+    ImageUploadRes upload(MultipartFile multipartFile);
 }

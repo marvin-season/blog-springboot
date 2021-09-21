@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +35,21 @@ public class UserController {
     }
 
     @ApiOperation("修改该用户头像")
-    @PostMapping("avatar/{id}/{avatar}")
-    public void updateAvatar(@PathVariable Integer id, @PathVariable String avatar) {
-        userService.updateAvatar(avatar, id);
+    @PostMapping("avatar")
+    public void updateAvatar(@RequestBody UserSaveReq req) {
+        userService.updateAvatar(req.getAvatar(), req.getId());
     }
 
     @ApiOperation("修改用户基本信息")
     @PostMapping("update")
     public void update(@RequestBody UserSaveReq req) {
         userService.update(req);
+    }
+
+
+    @GetMapping("{id}")
+    @ApiOperation("查询个人信息")
+    public UserSearchRes findById(@PathVariable("id") Integer id) {
+        return userService.findById(id);
     }
 }

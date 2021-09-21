@@ -1,8 +1,11 @@
 package marvin.ink.blogboot.req.user;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
+import marvin.ink.blogboot.model.entity.Role;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * @Author: 马文澍
@@ -27,4 +30,8 @@ public class UserSaveReq {
     private String phone;
     // 头像
     private String avatar;
+
+    private Boolean locked = false;
+
+    private Set<Role> roles;
 }

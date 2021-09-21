@@ -11,6 +11,7 @@ import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.UserService;
 import marvin.ink.blogboot.utils.SecurityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,6 +51,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userSaveReq.setPassword(passwordEncoder.encode(userSaveReq.getPassword()));
         user = BeanUtil.copyProperties(userSaveReq, User.class);
         user.setLocked(false);
+
+        if(ObjectUtil.isNull(userSaveReq.getAvatar())){
+            // 默认头像
+            user.setAvatar("https://marvin-blog.oss-cn-hangzhou.aliyuncs.com/20210921/49a62dd5b1154de58471268c72145d1b.jpg");
+        }
         baseMapper.insert(user);
         log.info("用户注册成功");
     }
@@ -74,6 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         bean.setAvatar(avatar);
         baseMapper.updateById(bean);
     }
+
     @Override
     public User principal() {
         Integer id = SecurityUtils.getUser().getId();
@@ -83,5 +90,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getId, id));
         user.setPassword(null);
         return user;
+    }
+
+    @Override
+    public UserSearchRes findById(Integer id) {
+
+        User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getId, id));
+        user.setPassword(null);
+        return BeanUtil.copyProperties(user, UserSearchRes.class);
     }
 }

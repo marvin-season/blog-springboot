@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.config.OssProperties;
 import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.enums.ResultEnum;
+import marvin.ink.blogboot.res.image.ImageUploadRes;
 import marvin.ink.blogboot.service.ImageService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -35,11 +35,9 @@ public class ImageServiceImpl implements ImageService {
     private OssProperties ossProperties;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public String upload(MultipartFile multipartFile) {
+    public ImageUploadRes upload(MultipartFile multipartFile) {
 
         String originalFilename = multipartFile.getOriginalFilename();
-
 
         String suffix = FileNameUtil.extName(originalFilename);
         String prefix = UUID.randomUUID().toString().replace("-", "");
@@ -61,12 +59,12 @@ public class ImageServiceImpl implements ImageService {
 
         try {
             ossClient.putObject(ossProperties.getBucket(), realPath, inputStream);
-
+            log.info("'文件上传成功");
         } catch (ClientException e) {
             log.warn("上传文件到OSS出错");
             throw CustomizeException.is(ResultEnum.FILE_UPLOAD_ERROR).hint("上传到OSS出错");
         }
 
-        return avatar;
+        return new ImageUploadRes().setImageUrl(avatar);
     }
 }

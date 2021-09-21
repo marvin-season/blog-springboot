@@ -3,6 +3,7 @@ package marvin.ink.blogboot.service;
 import io.swagger.models.auth.In;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.user.UserSearchRes;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -25,4 +26,6 @@ public interface UserService extends UserDetailsService {
      * 登录主体
      */
     User principal();
+
+    UserSearchRes findById(Integer id);
 }
