@@ -16,12 +16,7 @@ import java.io.Reader;
  * Description: Mybatis
  */
 public class Mybatis {
-    @Test
-    public void test1() throws IOException {
-        InputStream is = Resources.getResourceAsStream("");
-        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-        SqlSessionFactory factory = builder.build(is);
-        SqlSession sqlSession = factory.openSession();
-        User mapper = sqlSession.getMapper(User.class);
+    public static void main(String[] args) {
+        System.out.println("hello");
     }
 }

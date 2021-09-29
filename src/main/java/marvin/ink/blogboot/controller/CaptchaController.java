@@ -39,4 +39,17 @@ public class CaptchaController {
         Assert.isTrue(captchaService.verify(captchaReq.getId(), captchaReq.getCode()),
                 () -> CustomizeException.is(ResultEnum.CAPTCHA_ERROR).hint("验证码错误"));
     }
+
+    @ApiOperation("验证码获取redis")
+    @GetMapping("captcha/redis")
+    public CaptchaRes captchaWithRedis() {
+        return captchaService.getWithRedis();
+    }
+
+    @ApiOperation("验证码验证redis")
+    @PostMapping("verify/redis")
+    public void captchaWithRedis(@RequestBody @Validated CaptchaReq captchaReq) {
+        Assert.isTrue(captchaService.verifyWithRedis(captchaReq.getId(), captchaReq.getCode()),
+                () -> CustomizeException.is(ResultEnum.CAPTCHA_ERROR).hint("验证码错误"));
+    }
 }

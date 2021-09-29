@@ -9,4 +9,8 @@ public interface CaptchaService {
 
     boolean verify(String id, String input);
 
+    CaptchaRes getWithRedis();
+
+    boolean verifyWithRedis(String id, String input);
+
 }

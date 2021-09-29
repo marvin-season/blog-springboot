@@ -78,6 +78,7 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(Exception.class)
     public MyResponse<?> exception(Exception e) {
         log.warn("{}", e.toString());
+        e.printStackTrace();
         return MyResponse.is(ResultEnum.ERROR).hint(e.getMessage());
     }
 }

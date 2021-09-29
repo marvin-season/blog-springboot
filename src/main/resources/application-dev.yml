@@ -35,7 +35,7 @@ jwt:
 captcha:
   width: 100
   height: 50
-  expire-time: 120000
+  expire-time: 10
 ---
 # 文件上传
 aliyun:
@@ -49,4 +49,10 @@ spring:
     multipart:
       max-file-size: 2MB
       max-request-size: 2MB
+
+  redis:
+    host: 101.132.164.106
+    password: M@wenshu278990
+    port: 6379
+    timeout: 5000
 
