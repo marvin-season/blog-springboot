@@ -11,6 +11,7 @@ import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.user.UserRes;
 import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.UserService;
 import marvin.ink.blogboot.utils.SecurityUtils;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -52,7 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user = BeanUtil.copyProperties(userSaveReq, User.class);
         user.setLocked(false);
 
-        if(ObjectUtil.isNull(userSaveReq.getAvatar())){
+        if (ObjectUtil.isNull(userSaveReq.getAvatar())) {
             // 默认头像
             user.setAvatar("https://marvin-blog.oss-cn-hangzhou.aliyuncs.com/20210921/49a62dd5b1154de58471268c72145d1b.jpg");
         }
@@ -98,5 +100,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getId, id));
         user.setPassword(null);
         return BeanUtil.copyProperties(user, UserSearchRes.class);
+    }
+
+    @Override
+    public List<UserSearchRes> findMyLove(Integer userId) {
+        List<Integer> loveIds = baseMapper.findMyLove(userId);
+        if (ObjectUtil.isEmpty(loveIds)) {
+            return null;
+        }
+        List<User> users = baseMapper.selectList(Wrappers.<User>lambdaQuery()
+                .in(User::getId, loveIds));
+
+        return BeanUtil.copyToList(users, UserSearchRes.class);
+    }
+
+    @Override
+    public List<UserSearchRes> findMyFans(Integer userId) {
+        List<Integer> fansIds = baseMapper.findMyFans(userId);
+        if (ObjectUtil.isEmpty(fansIds)) {
+            return null;
+        }
+        List<User> users = baseMapper.selectList(Wrappers.<User>lambdaQuery()
+                .in(User::getId, fansIds));
+
+        return BeanUtil.copyToList(users, UserSearchRes.class);
     }
 }

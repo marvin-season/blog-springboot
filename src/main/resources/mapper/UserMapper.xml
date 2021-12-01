@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="marvin.ink.blogboot.dao.UserMapper">
+    <!--查找粉丝-->
+    <select id="findMyFans" resultType="int">
+        SELECT fansId
+        FROM user_fans
+        WHERE whoId = #{userId}
+    </select>
+    <!--    查找关注-->
+    <select id="findMyLove" resultType="java.lang.Integer">
+        SELECT whoId
+        FROM user_fans
+        WHERE fansId = #{userId}
+    </select>
+</mapper>

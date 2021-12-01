@@ -17,17 +17,19 @@ import marvin.ink.blogboot.model.entity.Category;
 import marvin.ink.blogboot.model.entity.Tag;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.model.pojo.BlogTag;
+import marvin.ink.blogboot.req.blog.BlogOptionsReq;
 import marvin.ink.blogboot.service.BlogService;
 import marvin.ink.blogboot.service.CategoryService;
 import marvin.ink.blogboot.service.TagService;
 import marvin.ink.blogboot.req.blog.BlogPageSearchReq;
 import marvin.ink.blogboot.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.res.blog.BlogRes;
+import marvin.ink.blogboot.res.blog.BlogTagRes;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,13 +53,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdate(BlogSaveReq blogSaveReq) {
-        log.info("blogSaveReq = {}", blogSaveReq);
         Assert.notNull(blogSaveReq, () -> CustomizeException.is(ResultEnum.PARAM_ERROR).hint("参数空指针异常"));
 
         // 判断分类存在否
         Category category = categoryService.findByCategoryId(blogSaveReq.getCategoryId());
         if (ObjectUtil.isNull(category)) {
-            log.info("分类 {} 不存在", blogSaveReq.getCategoryId());
             throw CustomizeException.is(ResultEnum.PARAM_ERROR).hint("分类不存在");
         }
 
@@ -72,48 +72,48 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 }
             });
         }
+
         Blog blog = BeanUtil.copyProperties(blogSaveReq, Blog.class);
         Blog bean = baseMapper.selectOne(Wrappers.<Blog>lambdaQuery().eq(Blog::getId, blog.getId()));
-        // 博客主体
+        // 博客存在
         if (ObjectUtil.isNotNull(bean)) {
-            log.info("修改博客...");
+            log.info("修改博客");
             blog.setUpdateTime(LocalDateTime.now());
             super.updateById(blog);
-            // 删除掉原来的标签
+            // 删除掉原来的标签， 后面重新添加
             baseMapper.deleteTagIdsByBlogId(blog.getId());
         } else {
-            log.info("新增博客...");
+            // 博客为新增
+            log.info("新增博客");
             super.save(blog);
             // 新增不用删除中间表中的blog与tag的映射关系
         }
-        // 新增中间表关系标签
-        if (ObjectUtil.isNotEmpty(tagIds)) {
-            tagIds.forEach(tagId -> {
-                BlogTag blogTag = new BlogTag().setBlogId(blog.getId()).setTagId(tagId);
-                blogTagMapper.insert(blogTag);
-            });
-        }
+        // 新增标签
+        tagIds.forEach(tagId -> {
+            BlogTag blogTag = new BlogTag().setBlogId(blog.getId()).setTagId(tagId);
+            blogTagMapper.insert(blogTag);
+        });
+
     }
 
     @Override
-    public PageData<BlogRes> findPublishedBlogByCondition(BlogPageSearchReq blogPageSearchReq) {
+    public PageData<BlogTagRes> findBlogByCondition(BlogPageSearchReq blogPageSearchReq) {
         log.info("blogPageSearchReq = {}", blogPageSearchReq);
         List<Blog> blogs = null;
         // 所有博客
         Page<Blog> blogPage = baseMapper.selectPage(new Page<>(blogPageSearchReq.getPageNo(), blogPageSearchReq.getPageSize()),
                 Wrappers.<Blog>lambdaQuery()
+                        .eq(ObjectUtils.isNotNull(blogPageSearchReq.getAuthorId()), Blog::getAuthorId, blogPageSearchReq.getAuthorId())
                         .like(ObjectUtils.isNotNull(blogPageSearchReq.getTitle()), Blog::getTitle, blogPageSearchReq.getTitle())
                         .or()
                         .eq(ObjectUtils.isNotNull(blogPageSearchReq.getCategoryId()), Blog::getCategoryId, blogPageSearchReq.getCategoryId())
                         .or()
-                        // 根据创建时间搜索
-                        .ge(ObjectUtils.isNotNull(blogPageSearchReq.getTime()), Blog::getCreateTime, blogPageSearchReq.getTime())
                         .and(wrapper -> {
                             wrapper.eq(Blog::getPublished, true);
                         })
         );
 
-        List<BlogRes> blogRes = BeanUtil.copyToList(blogPage.getRecords(), BlogRes.class);
+        List<BlogTagRes> blogRes = BeanUtil.copyToList(blogPage.getRecords(), BlogTagRes.class);
         // 查出所对应的标签
         this.withTags(blogRes);
 
@@ -122,31 +122,31 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         if (ObjectUtil.isNotEmpty(searchIds)) {
             blogRes = blogRes.stream().filter(blog -> {
                 List<Integer> tagIds = blog.getTags().stream().map(Tag::getId).collect(Collectors.toList());
-                // 只要包含一个标签就不过滤掉
+                // 只要包含一个标签就不过滤
                 return tagIds.stream().anyMatch(searchIds::contains);
             }).collect(Collectors.toList());
         }
 
-        PageData<BlogRes> blogResPage = PageData.of(blogPage, BlogRes.class);
+        PageData<BlogTagRes> blogResPage = PageData.of(blogPage, BlogTagRes.class);
         blogResPage.setRecords(blogRes);
         return blogResPage;
 
     }
 
     @Override
-    public List<BlogRes> findUnpublishedBlogByAuthorId(Integer authorId) {
+    public List<BlogTagRes> findUnpublishedBlogByAuthorId(Integer authorId) {
         List<Blog> blogs = baseMapper.selectList(Wrappers.<Blog>lambdaQuery()
                 .eq(Blog::getPublished, false)
                 .eq(Blog::getAuthorId, authorId)
         );
-        List<BlogRes> blogRes = BeanUtil.copyToList(blogs, BlogRes.class);
+        List<BlogTagRes> blogRes = BeanUtil.copyToList(blogs, BlogTagRes.class);
         withTags(blogRes);
         return blogRes;
     }
 
-    public void withTags(List<BlogRes> blogs) {
+    public void withTags(List<BlogTagRes> blogs) {
         blogs.forEach(blog -> {
-            List<Tag> tags = baseMapper.findBlogWithTagsByBlogId(blog.getId());
+            List<Tag> tags = baseMapper.findTagsByBlogId(blog.getId());
             blog.setTags(tags);
         });
     }
@@ -154,15 +154,60 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     @Transactional
     public void deleteById(Integer id) {
+        // 逻辑删除
         super.removeById(id);
     }
 
     @Override
-    public BlogRes findBlogByBlogId(int id) {
-        BlogRes blogRes = baseMapper.findBlogByBlogId(id);
-        if(ObjectUtil.isNull(blogRes)){
+    public BlogTagRes findBlogByBlogId(int id) {
+        BlogTagRes blogRes = baseMapper.findBlogByBlogId(id);
+        if (ObjectUtil.isNull(blogRes)) {
             throw CustomizeException.is(ResultEnum.DATA_NO_FOUND).hint("博客不存在!或被移动");
         }
         return blogRes;
+    }
+
+    @Override
+    public PageData<BlogTagRes> findBlogByOptions(BlogOptionsReq options) {
+        PageData<BlogTagRes> pageData = new PageData<BlogTagRes>(0, null, options.getPageSize());
+        Page<Blog> page = null;
+        if (options.isRecommend()) {
+            // 推荐博客， 查询点赞数在20以上的
+            page = baseMapper.selectPage(new Page<>(options.getPageNo(), options.getPageSize()),
+                    Wrappers.<Blog>lambdaQuery().ge(Blog::getLikeCount, 20));
+        } else if (options.isCollect()) {
+            // 收藏博客
+
+            //1、得到用户收藏的博客的系列id
+            List<Integer> blogIds = baseMapper.findCollectBlogIds(options.getAuthorId());
+            System.out.println(blogIds);
+            // 2、使用得到的id， 查找博客信息
+
+            if (ObjectUtil.isNotEmpty(blogIds)) {
+                page = baseMapper.selectPage(new Page<>(options.getPageNo(), options.getPageSize()),
+                        Wrappers.<Blog>lambdaQuery()
+                                .in(Blog::getId, blogIds)
+                );
+            }
+        } else {
+            // 其他条件
+            page = baseMapper.selectPage(new Page<>(options.getPageNo(), options.getPageSize()),
+                    Wrappers.<Blog>lambdaQuery()
+                            .eq(ObjectUtils.isNotNull(options.getAuthorId()), Blog::getAuthorId, options.getAuthorId())
+                            .eq(options.isDraft(), Blog::getPublished, false)
+            );
+
+        }
+
+        if (ObjectUtil.isNotNull(page)) {
+            List<BlogTagRes> blogRes = BeanUtil.copyToList(page.getRecords(), BlogTagRes.class);
+            //  同步博客标签
+            this.withTags(blogRes);
+
+            pageData = PageData.of(page, BlogTagRes.class);
+            pageData.setRecords(blogRes);
+        }
+
+        return pageData;
     }
 }

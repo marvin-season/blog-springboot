@@ -36,6 +36,9 @@ public class BlogSaveReq {
     @NotBlank(message = "文章标题不能为空")
     private String title;
 
+    @NotBlank(message = "文章概要不能为空")
+    private String summary;
+
     /**
      * 内容
      */

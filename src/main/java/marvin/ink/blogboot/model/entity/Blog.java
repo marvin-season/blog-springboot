@@ -25,6 +25,11 @@ public class Blog extends BaseEntity {
     private String title;
 
     /**
+     * 概要
+     */
+    private String summary;
+
+    /**
      * 内容
      */
     private String content;

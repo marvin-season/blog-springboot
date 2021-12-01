@@ -3,8 +3,13 @@ package marvin.ink.blogboot.service;
 import io.swagger.models.auth.In;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.user.UserRes;
 import marvin.ink.blogboot.res.user.UserSearchRes;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.List;
 
 /**
  * @Author: 马文澍
@@ -28,4 +33,9 @@ public interface UserService extends UserDetailsService {
     User principal();
 
     UserSearchRes findById(Integer id);
+
+    List<UserSearchRes> findMyFans(Integer userId);
+
+    List<UserSearchRes> findMyLove(Integer userId);
+
 }

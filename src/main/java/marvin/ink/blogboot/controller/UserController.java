@@ -4,11 +4,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.req.user.UserSaveReq;
+import marvin.ink.blogboot.res.user.UserRes;
 import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.UserService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author: 马文澍
@@ -24,7 +27,7 @@ public class UserController {
 
     @ApiOperation("注册用户")
     @PostMapping("registry")
-    public void registry(@RequestBody UserSaveReq userSaveReq) {
+    public void registry(@Validated @RequestBody UserSaveReq userSaveReq) {
         userService.registry(userSaveReq);
     }
 
@@ -51,5 +54,18 @@ public class UserController {
     @ApiOperation("查询个人信息")
     public UserSearchRes findById(@PathVariable("id") Integer id) {
         return userService.findById(id);
+    }
+
+
+    @ApiOperation("查询粉丝")
+    @GetMapping("fans/{userId}")
+    public List<UserSearchRes> findMyFans(@PathVariable Integer userId) {
+        return userService.findMyFans(userId);
+    }
+
+    @ApiOperation("查询关注")
+    @GetMapping("love/{userId}")
+    public List<UserSearchRes> findMyLove(@PathVariable Integer userId) {
+        return userService.findMyLove(userId);
     }
 }

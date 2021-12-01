@@ -10,7 +10,7 @@ import java.util.List;
  * @Date: 2021/8/27 21:05
  */
 
-public class BlogRes extends Blog {
+public class BlogTagRes extends Blog {
     private List<Tag> tags;
 
     public List<Tag> getTags() {

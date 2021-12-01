@@ -1,7 +1,7 @@
 server:
-  port: 8888
+  port: 20211
   servlet:
-    context-path: /marvin_blog
+    context-path: /blog
 mybatis-plus:
   configuration:
     auto-mapping-unknown-column-behavior: WARNING
@@ -35,7 +35,7 @@ jwt:
 captcha:
   width: 100
   height: 50
-  expire-time: 10
+  expire-time: 30
 ---
 # 文件上传
 aliyun:

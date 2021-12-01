@@ -3,7 +3,6 @@ package marvin.ink.blogboot.req.blog;
 import lombok.Data;
 import marvin.ink.blogboot.model.common.PageRequest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -27,32 +26,13 @@ public class BlogPageSearchReq extends PageRequest {
     private String title;
 
     /**
-     * 内容
-     */
-    private String content;
-    /**
-     * 浏览次数
-     */
-    private Integer viewCount;
-    /**
-     * 收藏次数
-     */
-    private Integer collectCount;
-    /**
-     * 点赞次数
-     */
-    private Integer likeCount;
-    /**
      * 博客状态
      */
     private Boolean locked;
-
-    private LocalDateTime time;
 
     /**
      * 标签的id
      */
     private List<Integer> tagIds;
 
-    private Boolean published;
 }

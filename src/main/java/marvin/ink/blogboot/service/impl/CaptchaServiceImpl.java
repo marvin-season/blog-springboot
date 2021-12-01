@@ -64,6 +64,7 @@ public class CaptchaServiceImpl implements CaptchaService, InitializingBean {
     }
 
 
+    @Override
     public CaptchaRes getWithRedis() {
         LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(captchaProperties.getWidth(), captchaProperties.getHeight());
         String uuid = IdUtil.fastSimpleUUID();
@@ -75,6 +76,7 @@ public class CaptchaServiceImpl implements CaptchaService, InitializingBean {
         return new CaptchaRes().setId(uuid).setImage(lineCaptcha.getImageBase64Data());
     }
 
+    @Override
     public boolean verifyWithRedis(String uuid, String input) {
 
         ValueOperations<String, String> forValue = stringRedisTemplate.opsForValue();

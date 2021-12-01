@@ -4,9 +4,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.model.common.PageData;
+import marvin.ink.blogboot.req.blog.BlogOptionsReq;
 import marvin.ink.blogboot.req.blog.BlogPageSearchReq;
 import marvin.ink.blogboot.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.res.blog.BlogRes;
+import marvin.ink.blogboot.res.blog.BlogTagRes;
 import marvin.ink.blogboot.service.BlogService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,6 @@ import java.util.List;
 @RequestMapping("blog")
 @Slf4j
 public class BlogController {
-    // TODO 前端参数传值问题
-
     @Resource
     private BlogService blogService;
 
@@ -34,21 +33,9 @@ public class BlogController {
         blogService.saveOrUpdate(blogReq);
     }
 
-    @ApiOperation("查询已发布博客")
-    @GetMapping("published")
-    public PageData<BlogRes> findPublishedBlogByCondition(@Validated BlogPageSearchReq blogPageSearchReq) {
-        return blogService.findPublishedBlogByCondition(blogPageSearchReq);
-    }
-
-    @ApiOperation("查询未发布博客")
-    @GetMapping("unpublished/{authorId}")
-    public List<BlogRes> findUnpublishedBlogByCondition(@PathVariable("authorId") Integer authorId) {
-        return blogService.findUnpublishedBlogByAuthorId(authorId);
-    }
-
     @ApiOperation("根据id查询博客")
     @GetMapping("/{id}")
-    public BlogRes findBlogByBlogId(@PathVariable int id){
+    public BlogTagRes findBlogByBlogId(@PathVariable int id) {
         return blogService.findBlogByBlogId(id);
     }
 
@@ -56,6 +43,14 @@ public class BlogController {
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable("id") Integer id) {
         blogService.deleteById(id);
+    }
+
+
+    @ApiOperation("根据条件查询博客列表")
+    @GetMapping("findBlogByOptions")
+    PageData<BlogTagRes> findBlogByOptions(@Validated BlogOptionsReq options) {
+        log.info("options:{}", options);
+        return blogService.findBlogByOptions(options);
     }
 
 }
