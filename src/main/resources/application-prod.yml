@@ -1,5 +1,5 @@
 server:
-  port: 8888
+  port: 20211
   servlet:
     context-path: /blog
 mybatis-plus:

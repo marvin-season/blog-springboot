@@ -10,7 +10,7 @@ import marvin.ink.blogboot.config.security.UserSession;
  */
 @Data
 @Accessors(chain = true)
-public class UserRes {
+public class UserTokenRes {
     private String token;
 
     private String header;

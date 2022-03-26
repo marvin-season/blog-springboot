@@ -2,9 +2,10 @@ package marvin.ink.blogboot.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import marvin.ink.blogboot.model.common.PageData;
 import marvin.ink.blogboot.model.entity.User;
+import marvin.ink.blogboot.req.user.UserPageSearchReq;
 import marvin.ink.blogboot.req.user.UserSaveReq;
-import marvin.ink.blogboot.res.user.UserRes;
 import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.UserService;
 import org.springframework.validation.annotation.Validated;
@@ -32,6 +33,7 @@ public class UserController {
     }
 
 
+    @ApiOperation("获取用户登录信息")
     @GetMapping("principal")
     public User principal() {
         return userService.principal();
@@ -67,5 +69,23 @@ public class UserController {
     @GetMapping("love/{userId}")
     public List<UserSearchRes> findMyLove(@PathVariable Integer userId) {
         return userService.findMyLove(userId);
+    }
+
+    @ApiOperation("添加关注")
+    @PostMapping("addLove/{whoId}/{fansId}")
+    public void addLove(@PathVariable Integer whoId, @PathVariable Integer fansId) {
+        userService.addLove(whoId, fansId);
+    }
+
+    @ApiOperation("取消关注")
+    @PostMapping("deleteLove/{whoId}/{fansId}")
+    public void deleteLove(@PathVariable Integer whoId, @PathVariable Integer fansId) {
+        userService.deleteLove(whoId, fansId);
+    }
+
+    @ApiOperation("查询所有")
+    @GetMapping("findAll")
+    public PageData<UserSearchRes> findAll(@Validated UserPageSearchReq pageSearchReq) {
+        return userService.findAll(pageSearchReq);
     }
 }

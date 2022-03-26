@@ -2,6 +2,7 @@ package marvin.ink.blogboot.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import marvin.ink.blogboot.model.common.BaseEntity;
 import org.apache.ibatis.type.Alias;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +17,7 @@ import java.util.Set;
  */
 @Data
 @Alias("Author")
+@Accessors(chain = true)
 public class User extends BaseEntity implements UserDetails {
 
     private String username;

@@ -4,7 +4,7 @@ import marvin.ink.blogboot.model.common.PageData;
 import marvin.ink.blogboot.req.blog.BlogOptionsReq;
 import marvin.ink.blogboot.req.blog.BlogPageSearchReq;
 import marvin.ink.blogboot.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.res.blog.BlogTagRes;
+import marvin.ink.blogboot.res.blog.BlogInfoRes;
 
 import java.util.List;
 
@@ -15,13 +15,13 @@ import java.util.List;
 public interface BlogService {
     void saveOrUpdate(BlogSaveReq blogSaveReq);
 
-    PageData<BlogTagRes> findBlogByCondition(BlogPageSearchReq blogPageSearchReq);
+    PageData<BlogInfoRes> findBlogByCondition(BlogPageSearchReq blogPageSearchReq);
 
-    List<BlogTagRes> findUnpublishedBlogByAuthorId(Integer authorId);
+    List<BlogInfoRes> findUnpublishedBlogByAuthorId(Integer authorId);
 
     void deleteById(Integer id);
 
-    BlogTagRes findBlogByBlogId(int id);
+    BlogInfoRes findBlogByBlogId(int id);
 
-    PageData<BlogTagRes> findBlogByOptions(BlogOptionsReq options);
+    PageData<BlogInfoRes> findBlogByOptions(BlogOptionsReq options);
 }

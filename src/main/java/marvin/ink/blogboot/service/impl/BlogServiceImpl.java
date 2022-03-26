@@ -15,21 +15,23 @@ import marvin.ink.blogboot.model.common.PageData;
 import marvin.ink.blogboot.model.entity.Blog;
 import marvin.ink.blogboot.model.entity.Category;
 import marvin.ink.blogboot.model.entity.Tag;
+import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.model.pojo.BlogTag;
 import marvin.ink.blogboot.req.blog.BlogOptionsReq;
+import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.BlogService;
 import marvin.ink.blogboot.service.CategoryService;
 import marvin.ink.blogboot.service.TagService;
 import marvin.ink.blogboot.req.blog.BlogPageSearchReq;
 import marvin.ink.blogboot.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.res.blog.BlogTagRes;
+import marvin.ink.blogboot.res.blog.BlogInfoRes;
+import marvin.ink.blogboot.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Resource
     private TagService tagService;
+
+    @Resource
+    private UserService userService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -97,7 +102,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    public PageData<BlogTagRes> findBlogByCondition(BlogPageSearchReq blogPageSearchReq) {
+    public PageData<BlogInfoRes> findBlogByCondition(BlogPageSearchReq blogPageSearchReq) {
         log.info("blogPageSearchReq = {}", blogPageSearchReq);
         List<Blog> blogs = null;
         // 所有博客
@@ -113,7 +118,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                         })
         );
 
-        List<BlogTagRes> blogRes = BeanUtil.copyToList(blogPage.getRecords(), BlogTagRes.class);
+        List<BlogInfoRes> blogRes = BeanUtil.copyToList(blogPage.getRecords(), BlogInfoRes.class);
         // 查出所对应的标签
         this.withTags(blogRes);
 
@@ -127,24 +132,24 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             }).collect(Collectors.toList());
         }
 
-        PageData<BlogTagRes> blogResPage = PageData.of(blogPage, BlogTagRes.class);
+        PageData<BlogInfoRes> blogResPage = PageData.of(blogPage, BlogInfoRes.class);
         blogResPage.setRecords(blogRes);
         return blogResPage;
 
     }
 
     @Override
-    public List<BlogTagRes> findUnpublishedBlogByAuthorId(Integer authorId) {
+    public List<BlogInfoRes> findUnpublishedBlogByAuthorId(Integer authorId) {
         List<Blog> blogs = baseMapper.selectList(Wrappers.<Blog>lambdaQuery()
                 .eq(Blog::getPublished, false)
                 .eq(Blog::getAuthorId, authorId)
         );
-        List<BlogTagRes> blogRes = BeanUtil.copyToList(blogs, BlogTagRes.class);
+        List<BlogInfoRes> blogRes = BeanUtil.copyToList(blogs, BlogInfoRes.class);
         withTags(blogRes);
         return blogRes;
     }
 
-    public void withTags(List<BlogTagRes> blogs) {
+    public void withTags(List<BlogInfoRes> blogs) {
         blogs.forEach(blog -> {
             List<Tag> tags = baseMapper.findTagsByBlogId(blog.getId());
             blog.setTags(tags);
@@ -159,8 +164,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    public BlogTagRes findBlogByBlogId(int id) {
-        BlogTagRes blogRes = baseMapper.findBlogByBlogId(id);
+    public BlogInfoRes findBlogByBlogId(int id) {
+        BlogInfoRes blogRes = baseMapper.findBlogByBlogId(id);
         if (ObjectUtil.isNull(blogRes)) {
             throw CustomizeException.is(ResultEnum.DATA_NO_FOUND).hint("博客不存在!或被移动");
         }
@@ -168,8 +173,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    public PageData<BlogTagRes> findBlogByOptions(BlogOptionsReq options) {
-        PageData<BlogTagRes> pageData = new PageData<BlogTagRes>(0, null, options.getPageSize());
+    public PageData<BlogInfoRes> findBlogByOptions(BlogOptionsReq options) {
+        PageData<BlogInfoRes> pageData = new PageData<BlogInfoRes>(0, null, options.getPageSize());
         Page<Blog> page = null;
         if (options.isRecommend()) {
             // 推荐博客， 查询点赞数在20以上的
@@ -200,14 +205,25 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         }
 
         if (ObjectUtil.isNotNull(page)) {
-            List<BlogTagRes> blogRes = BeanUtil.copyToList(page.getRecords(), BlogTagRes.class);
+            List<BlogInfoRes> blogRes = BeanUtil.copyToList(page.getRecords(), BlogInfoRes.class);
             //  同步博客标签
             this.withTags(blogRes);
 
-            pageData = PageData.of(page, BlogTagRes.class);
+            // 同步用户信息
+            this.withUser(blogRes);
+
+            pageData = PageData.of(page, BlogInfoRes.class);
             pageData.setRecords(blogRes);
         }
 
         return pageData;
+    }
+
+    private void withUser(List<BlogInfoRes> blogs) {
+        blogs.forEach(blog -> {
+            UserSearchRes userSearchRes = userService.findById(blog.getAuthorId());
+            blog.setUsername(userSearchRes.getUsername());
+            blog.setAvatar(userSearchRes.getAvatar());
+        });
     }
 }

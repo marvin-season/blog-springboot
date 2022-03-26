@@ -4,14 +4,17 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.dao.UserMapper;
 import marvin.ink.blogboot.exception.CustomizeException;
+import marvin.ink.blogboot.model.common.PageData;
+import marvin.ink.blogboot.model.entity.Role;
 import marvin.ink.blogboot.model.entity.User;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.req.user.UserSaveReq;
-import marvin.ink.blogboot.res.user.UserRes;
+import marvin.ink.blogboot.req.user.UserPageSearchReq;
 import marvin.ink.blogboot.res.user.UserSearchRes;
 import marvin.ink.blogboot.service.UserService;
 import marvin.ink.blogboot.utils.SecurityUtils;
@@ -22,7 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,8 +43,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         log.info("username = {}", username);
         User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
+
         if (ObjectUtil.isNull(user)) {
             throw new UsernameNotFoundException("用户不存在");
+        }
+
+        if (user.getLocked()) {
+            throw new CustomizeException().hint("账户被封禁").message("请联系管理员");
         }
 
         // user.setAuthorities(AuthorityUtils.commaSeparatedStringToAuthorityList("admin, user"));
@@ -91,14 +103,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getId, id));
         user.setPassword(null);
+
+        // 查询用户拥有的角色
+        ArrayList<User> users = new ArrayList<>();
+        users.add(user);
+        this.withRole(users);
         return user;
+    }
+
+    private void withRole(List<? extends User> users) {
+        users.forEach(user -> {
+            Integer id = user.getId();
+            if (ObjectUtil.isNotNull(id)) {
+                Role role = baseMapper.findRoleByUserId(id);
+                HashSet<Role> roles = new HashSet<>();
+                roles.add(role);
+                user.setRoles(roles);
+            }
+        });
     }
 
     @Override
     public UserSearchRes findById(Integer id) {
 
         User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getId, id));
-        user.setPassword(null);
+        if (ObjectUtil.isNotNull(user)) {
+            user.setPassword(null);
+        }
         return BeanUtil.copyProperties(user, UserSearchRes.class);
     }
 
@@ -112,6 +143,46 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .in(User::getId, loveIds));
 
         return BeanUtil.copyToList(users, UserSearchRes.class);
+    }
+
+    @Override
+    public void addLove(Integer whoId, Integer fansId) {
+        baseMapper.addLove(whoId, fansId);
+    }
+
+    @Override
+    public void deleteLove(Integer whoId, Integer fansId) {
+        baseMapper.deleteLove(whoId, fansId);
+    }
+
+    @Override
+    public PageData<UserSearchRes> findAll(UserPageSearchReq pageReq) {
+        Page<User> page = baseMapper.selectPage(new Page<>(pageReq.getPageNo(), pageReq.getPageSize()),
+                Wrappers.<User>lambdaQuery()
+                        .eq(ObjectUtil.isNotNull(pageReq.getMail()), User::getMail, pageReq.getMail())
+                        .eq(ObjectUtil.isNotNull(pageReq.getQq()), User::getQq, pageReq.getQq())
+                        .like(ObjectUtil.isNotNull(pageReq.getUsername()), User::getUsername, pageReq.getUsername())
+                        .like(ObjectUtil.isNotNull(pageReq.getWx()), User::getWx, pageReq.getWx())
+                        .eq(ObjectUtil.isNotNull(pageReq.getPhone()), User::getPhone, pageReq.getPhone())
+        );
+
+        //  过滤
+        if (ObjectUtil.isNotNull(pageReq.getRoleName())) {
+            List<User> users = baseMapper.findUserByRoleName(pageReq.getRoleName());
+
+            List<User> collect = page.getRecords().stream()
+                    .filter(user ->
+                            users.stream().noneMatch(u ->
+                                    Objects.equals(u.getId(), user.getId())))
+                    .collect(Collectors.toList());
+
+            page.setRecords(collect);
+        }
+
+        List<User> records = page.getRecords();
+        this.withRole(records);
+        page.setRecords(records);
+        return PageData.of(page, UserSearchRes.class);
     }
 
     @Override

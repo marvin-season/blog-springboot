@@ -5,15 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import marvin.ink.blogboot.model.common.PageData;
 import marvin.ink.blogboot.req.blog.BlogOptionsReq;
-import marvin.ink.blogboot.req.blog.BlogPageSearchReq;
 import marvin.ink.blogboot.req.blog.BlogSaveReq;
-import marvin.ink.blogboot.res.blog.BlogTagRes;
+import marvin.ink.blogboot.res.blog.BlogInfoRes;
 import marvin.ink.blogboot.service.BlogService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @Author: 马文澍
@@ -35,7 +33,7 @@ public class BlogController {
 
     @ApiOperation("根据id查询博客")
     @GetMapping("/{id}")
-    public BlogTagRes findBlogByBlogId(@PathVariable int id) {
+    public BlogInfoRes findBlogByBlogId(@PathVariable int id) {
         return blogService.findBlogByBlogId(id);
     }
 
@@ -48,7 +46,7 @@ public class BlogController {
 
     @ApiOperation("根据条件查询博客列表")
     @GetMapping("findBlogByOptions")
-    PageData<BlogTagRes> findBlogByOptions(@Validated BlogOptionsReq options) {
+    PageData<BlogInfoRes> findBlogByOptions(@Validated BlogOptionsReq options) {
         log.info("options:{}", options);
         return blogService.findBlogByOptions(options);
     }

@@ -10,7 +10,7 @@ import marvin.ink.blogboot.exception.CustomizeException;
 import marvin.ink.blogboot.model.common.MyResponse;
 import marvin.ink.blogboot.model.enums.ResultEnum;
 import marvin.ink.blogboot.req.user.UserLoginReq;
-import marvin.ink.blogboot.res.user.UserRes;
+import marvin.ink.blogboot.res.user.UserTokenRes;
 import marvin.ink.blogboot.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -70,7 +70,7 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
         UserSession userSession = BeanUtil.copyProperties(authResult.getPrincipal(), UserSession.class);
         String token = jwtUtils.genToken(userSession);
 
-        UserRes userRes = new UserRes()
+        UserTokenRes userTokenRes = new UserTokenRes()
                 .setToken(JwtProperties.TOKEN_PREFIX + token)
                 .setHeader(JwtProperties.HEADER);
         response.setContentType("application/json;charset=utf-8");
@@ -78,7 +78,7 @@ public class TokenServiceFilter extends UsernamePasswordAuthenticationFilter {
 
 
         try (ServletOutputStream out = response.getOutputStream()) {
-            objectMapper.writeValue(out, MyResponse.success(userRes));
+            objectMapper.writeValue(out, MyResponse.success(userTokenRes));
         }
 
     }

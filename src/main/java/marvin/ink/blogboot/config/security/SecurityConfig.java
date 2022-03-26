@@ -5,7 +5,6 @@ import marvin.ink.blogboot.filter.TokenServiceFilter;
 import marvin.ink.blogboot.handler.MyAccessDeniedHandler;
 import marvin.ink.blogboot.handler.MyAuthenticationEntryPointHandler;
 import marvin.ink.blogboot.service.UserService;
-import marvin.ink.blogboot.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     MyAccessDeniedHandler accessDeniedHandler;
 
     private final String[] allowUrls = {
+            "/imserver/**",
             "/swagger-ui.html",
             "/webjars/**",
             "/swagger-resources/**",
@@ -61,6 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/user/registry",
             "/user/forget-password",
             "/captcha/**",
+            "/static/**",
+            "/index.html"
     };
 
     @Bean
@@ -74,7 +76,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(allowUrls).permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 // 异常处理
                 .and()
