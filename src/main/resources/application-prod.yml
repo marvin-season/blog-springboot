@@ -40,8 +40,8 @@ captcha:
 # 文件上传
 aliyun:
   oss:
-    access-key: LTAI5tDq6Az6zJrBmcKoxsc4
-    secret-key: U9gHUVcvk1M23ufFciB2O7uaBhqK87
+    access-key: 1234234
+    secret-key: 2343234
     endpoint: oss-cn-hangzhou.aliyuncs.com
     bucket: marvin-blog
 spring:
